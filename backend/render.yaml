@@ -2,7 +2,7 @@ services:
   - type: web
     name: smarthire-genai-api
     runtime: python
-    plan: starter
+    plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:$PORT
@@ -18,7 +18,7 @@ services:
       - key: LLM_MODEL
         value: sarvam-105b
       - key: EMBEDDING_MODEL
-        value: sentence-transformers/all-MiniLM-L6-v2
+        value: BAAI/bge-small-en-v1.5
       - key: CORS_ORIGINS
         sync: false
       - key: CHUNK_SIZE

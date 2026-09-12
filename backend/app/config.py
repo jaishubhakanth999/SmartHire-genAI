@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"  # served via fastembed (ONNX, no torch)
 EMBEDDING_DIMENSIONS = 384  # must match the vector(384) columns in supabase/migrations
 
 
