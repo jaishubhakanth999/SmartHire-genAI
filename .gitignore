@@ -1,5 +1,8 @@
 # Secrets
 .env
+.env.local
+backend/.env
+frontend/.env.local
 
 # Python
 __pycache__/
@@ -8,19 +11,13 @@ __pycache__/
 venv/
 *.egg-info/
 
-# Notebooks
-.ipynb_checkpoints/
-
-# FAISS build artefacts (rebuildable -- keep the folder, ignore the index)
-vectorstore/*
-!vectorstore/.gitkeep
-!vectorstore/README.md
-
-# Real candidate data (only commit anonymised/synthetic samples)
-data/resumes/*
-!data/resumes/.gitkeep
-!data/resumes/README.md
-!data/resumes/SAMPLE_resume.txt
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+*.tsbuildinfo
+next-env.d.ts
 
 # OS / editor
 .DS_Store
@@ -28,5 +25,5 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Streamlit
-.streamlit/secrets.toml
+# Legacy Streamlit artifacts (kept in legacy/ for reference; never re-created)
+legacy/**/__pycache__/
