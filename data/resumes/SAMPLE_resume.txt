@@ -1,0 +1,25 @@
+Asha Kapoor
+asha.kapoor.sample@example.com | +91 90000 00000
+
+Target role: Data Analyst
+
+Summary
+Recent Computer Science graduate with hands-on experience in SQL, Python and
+data visualization from coursework and a six-month internship. Looking to
+move into a data analyst role.
+
+Skills
+SQL, Python, Pandas, Excel, Power BI, Statistics, Data Cleaning, Git
+
+Experience
+Data Analytics Intern -- Example University Analytics Lab (Jan 2025 - Jun 2025)
+- Cleaned and joined multiple raw datasets in Python/pandas for a student
+  outcomes research project.
+- Wrote SQL queries to aggregate enrollment data across five years.
+- Built two Power BI dashboards used by the department to track trends.
+
+Teaching Assistant -- Introduction to Statistics, Example University (2024)
+- Ran weekly lab sessions covering descriptive statistics and hypothesis testing.
+
+Education
+B.Sc. Computer Science, Example University, 2025

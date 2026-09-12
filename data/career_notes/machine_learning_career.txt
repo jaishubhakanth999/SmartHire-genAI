@@ -1,0 +1,42 @@
+Machine Learning and AI Engineering Career Guide
+
+Machine learning roles sit on a spectrum from research-heavy (ML Researcher, Applied
+Scientist) to engineering-heavy (ML Engineer, MLOps Engineer). Most industry roles lean
+toward the engineering end: building and deploying reliable models matters more than
+publishing novel algorithms.
+
+Core skills employers look for
+- Python fluency (NumPy, pandas, scikit-learn at minimum)
+- At least one deep learning framework (PyTorch is now the dominant choice in research
+  and increasingly in industry; TensorFlow/Keras is still common in production)
+- Understanding of fundamental model classes: regression, classification, clustering,
+  language models, computer vision CNNs
+- Ability to evaluate models properly: train/val/test splits, cross-validation, metrics
+  beyond accuracy (precision, recall, F1, AUC-ROC, RMSE depending on the task)
+- Basic data engineering: loading and cleaning data, feature engineering, handling
+  missing values and class imbalance
+
+For AI/LLM engineering specifically (a rapidly growing specialization):
+- Prompt engineering and few-shot design
+- Retrieval-augmented generation (RAG) pipelines with vector databases (FAISS, Pinecone,
+  Weaviate, Chroma)
+- Fine-tuning techniques (LoRA/QLORA for LLMs)
+- LangChain or LlamaIndex for orchestration
+- Evaluation of LLM outputs (correctness, grounding, safety)
+
+Building a portfolio
+A well-documented end-to-end ML project is worth more than a collection of Kaggle
+notebook kernels. Ideal structure: a clear problem statement, dataset description,
+baseline model, improved model, and honest evaluation with a confusion matrix or error
+analysis. Deploy the model as a simple web app or API to show you can close the loop.
+
+Career path
+Junior ML Engineer -> ML Engineer -> Senior ML Engineer -> Staff/Principal -> ML Engineering Manager
+or the individual-contributor research track at larger companies.
+
+Switching into ML
+If you have a software engineering background, the transition is achievable with 6-12
+months of focused study. If you have a statistics or data science background, the gap
+to close is mostly on the engineering side (packaging, APIs, deployment). A domain
+background (healthcare, finance, robotics) combined with ML skills is highly valuable
+in specialized industries.

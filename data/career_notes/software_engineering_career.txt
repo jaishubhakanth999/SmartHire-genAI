@@ -1,0 +1,35 @@
+Software Engineering Career Guide
+
+Software engineering roles vary widely by specialization: backend, frontend, full-stack,
+DevOps/SRE, mobile, embedded, and machine learning engineering are among the most common.
+Most roles share a foundation: comfort with at least one general-purpose language (Python,
+Java, Go, JavaScript, C++ are the most in-demand), data structures and algorithms, and
+version control with Git.
+
+Getting started
+If you are early in your career, build two or three complete projects you can walk a
+hiring manager through end to end -- a project with a real user, a database, an API, and
+deployed somewhere (even a free tier) shows more than a collection of isolated scripts.
+Contribute to an open-source project, even in a small way (documentation fixes, tests,
+minor bugs), to show you can navigate an unfamiliar codebase.
+
+Technical interviews
+Most software engineering interview processes include:
+1. A phone or video screen with a few coding questions (linked lists, strings, hashmaps,
+   basic trees -- LeetCode Easy/Medium level).
+2. A longer take-home or live coding round, often with a real-world design element.
+3. A system design round (for mid-to-senior roles): how would you design a URL shortener,
+   a notification system, a feed -- covering scalability, data modeling, trade-offs.
+
+Resume conventions
+Use bullet points that follow the "did X, measured by Y, to achieve Z" structure.
+Quantify impact where possible: lines of code shipped rarely impresses but "reduced API
+latency by 40%" or "cut deploy time from 30 min to 5 min" does.
+Keep the resume to one page for under five years of experience; two pages is acceptable
+beyond that.
+
+Salary negotiation
+Software engineers frequently under-negotiate. Research market rates on Glassdoor, Levels.fyi
+(for tech companies), and LinkedIn Salary before any offer call. It is standard practice
+to ask for time to consider and to negotiate; almost no company rescinds an offer because
+a candidate asked for more.

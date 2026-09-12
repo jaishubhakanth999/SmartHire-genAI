@@ -1,0 +1,11 @@
+title,company,skills,description
+Data Analyst,Sample Analytics Co.,"SQL, Excel, Power BI, Statistics","Analyze weekly sales and marketing data, build dashboards in Power BI, and present findings to stakeholders. Requires strong SQL and comfort with basic statistics."
+Junior Data Analyst,Example Retail Group,"SQL, Excel, Python, Pandas","Support the analytics team with ad-hoc reporting, data cleaning in Python/pandas, and maintaining recurring Excel reports."
+Business Analyst,Northfield Consulting (Sample),"SQL, Excel, Requirements Gathering, PowerPoint","Gather business requirements from stakeholders, translate them into technical specifications, and analyze process data in SQL and Excel."
+Machine Learning Engineer,Sample AI Labs,"Python, PyTorch, Machine Learning, FAISS, LangChain","Build and deploy ML models, including embedding-based retrieval systems using FAISS and LLM orchestration with LangChain."
+Software Engineer (Backend),Example Cloud Systems,"Python, REST APIs, PostgreSQL, Docker","Design and maintain backend services and REST APIs, work with PostgreSQL, and containerize services with Docker."
+Frontend Developer,Sample Web Studio,"JavaScript, React, CSS, HTML","Build responsive web interfaces in React, collaborate with designers, and optimize front-end performance."
+AI/NLP Engineer,Sample NLP Systems,"Python, LangChain, Embeddings, RAG, Prompt Engineering","Build retrieval-augmented generation pipelines with LangChain, tune prompts, and evaluate LLM output quality."
+Data Scientist,Example FinTech Co.,"Python, Statistics, Machine Learning, SQL","Build predictive models for credit risk, run statistical analysis, and communicate findings to non-technical stakeholders."
+DevOps Engineer,Sample Cloud Ops,"AWS, Docker, CI/CD, Python","Maintain CI/CD pipelines, manage AWS infrastructure, and automate deployment workflows using Python scripting."
+Career Coach / L&D Specialist,Example People Co.,"Coaching, Career Development, Communication","Provide one-on-one career coaching, design skill-development workshops, and support internal mobility programs."

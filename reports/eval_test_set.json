@@ -1,0 +1,23 @@
+{
+  "_comment": "STARTER template. Replace/extend these with your own resumes, jobs and mentor questions once the real Kaggle job dataset and your own career notes are in place. src/evaluate.py reads this and produces real, freshly-computed results -- nothing here is a result, only test input.",
+
+  "job_match_profiles": [
+    {
+      "label": "Data-analyst-shaped resume",
+      "resume_text": "SQL, Python, Pandas, Excel, Power BI, Statistics. Data analytics internship building dashboards and cleaning data.",
+      "expected_job_title_contains": "Data Analyst",
+      "top_k": 5
+    }
+  ],
+
+  "mentor_questions": [
+    {
+      "question": "How do I switch into a Data Analyst role from an unrelated background?",
+      "expected_keywords": ["SQL", "portfolio", "project"]
+    },
+    {
+      "question": "What's the capital of France?",
+      "expected_keywords": []
+    }
+  ]
+}

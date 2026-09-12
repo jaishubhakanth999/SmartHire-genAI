@@ -1,0 +1,42 @@
+Resume Writing Fundamentals
+
+A resume is a marketing document, not a biography. Its one job is to get you a phone
+screen. Keep that goal in mind for every decision.
+
+Length and format
+One page for under five years of experience. Two pages is acceptable for senior roles.
+Never three pages. Use a clean, readable font (10-12 pt), consistent margins, and plain
+section headings. Avoid tables, columns, and graphics if you are applying through an
+Applicant Tracking System (ATS) -- they often scramble the parsing.
+
+Section order (standard)
+1. Contact info (name, city/country, phone, email, LinkedIn URL, GitHub if relevant)
+2. Professional summary (2-3 lines, optional but useful for career changers)
+3. Skills (a short list of tools and technologies)
+4. Experience (most recent first, reverse-chronological)
+5. Education
+6. Certifications / projects (if relevant)
+
+Writing strong bullet points
+Use the formula: [Action verb] + [what you did] + [measurable result].
+Weak:   "Responsible for building dashboards."
+Strong: "Built 4 Power BI dashboards tracking weekly sales KPIs, reducing
+         manual reporting time by 3 hours per week."
+
+Skills section
+List only skills you can defend in an interview. Group them logically:
+Languages, Frameworks, Databases, Tools, Platforms.
+Do not list Microsoft Word or "fast learner" as skills.
+
+Tailoring for each application
+Read the job description carefully and mirror its language where your experience
+genuinely overlaps. ATS systems score resumes on keyword matches before a human
+sees them. Tailor the skills section and the summary for each role -- the experience
+bullets themselves can stay the same.
+
+Common mistakes
+- Typos and grammar errors (spell-check is not enough; read it aloud).
+- Responsibilities listed instead of accomplishments.
+- Dates missing or formatted inconsistently.
+- Contact email that sounds unprofessional.
+- Listing every technology you have ever touched instead of the ones you know well.

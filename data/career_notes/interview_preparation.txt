@@ -1,0 +1,41 @@
+Interview Preparation Guide
+
+Behavioural interviews
+Most companies use the STAR format: Situation, Task, Action, Result.
+Prepare five to eight stories from your experience that can be adapted to common
+questions: a time you dealt with conflict, a time you failed and learned, your biggest
+achievement, a time you had to influence someone without authority.
+Strong answers are specific and use numbers where possible ("the team missed the deadline
+by two weeks" not "we had some delays").
+
+Technical preparation
+- For software engineering: review data structures (arrays, linked lists, trees, graphs,
+  hashmaps), sorting algorithms, recursion, dynamic programming basics. Practice on
+  LeetCode -- aim for ~50-100 easy/medium problems before interviews at large companies.
+- For data roles: practice SQL (joins, aggregations, window functions, subqueries),
+  Python/pandas for data wrangling, and be able to talk through a statistics concept
+  such as A/B testing, p-values, or confidence intervals clearly.
+- For ML roles: understand the bias-variance trade-off, regularization, gradient descent,
+  and be ready to design a model evaluation strategy for a new problem.
+
+System design preparation (for mid-senior roles)
+Practice walking through designs out loud. Use a consistent structure:
+  1. Clarify requirements and constraints (scale, latency, consistency needs)
+  2. Estimate capacity (users, QPS, storage)
+  3. Design the high-level architecture (services, databases, queues)
+  4. Dive deep on one or two key components
+  5. Discuss trade-offs and what you would do differently at larger scale
+
+Common mistakes
+- Not asking clarifying questions before jumping into a coding problem.
+- Writing code without explaining your thinking aloud during a live interview.
+- Giving vague behavioural answers ("we worked hard and figured it out").
+- Negotiating salary too early in the process, before an offer is on the table.
+- Not following up with a thank-you note or email after the interview.
+
+Day-of tips
+- Sleep well the night before.
+- Have two or three questions ready to ask the interviewer (about the team,
+  the tech stack, or current challenges).
+- If you get stuck on a coding problem, narrate your thought process -- partial
+  credit exists, and interviewers are assessing how you think.
