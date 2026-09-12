@@ -1,0 +1,32 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# FAISS build artefacts (rebuildable -- keep the folder, ignore the index)
+vectorstore/*
+!vectorstore/.gitkeep
+!vectorstore/README.md
+
+# Real candidate data (only commit anonymised/synthetic samples)
+data/resumes/*
+!data/resumes/.gitkeep
+!data/resumes/README.md
+!data/resumes/SAMPLE_resume.txt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/secrets.toml
