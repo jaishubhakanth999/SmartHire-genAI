@@ -9,6 +9,16 @@ Credentials are intentionally simple for a capstone demo. In production, use
 a secrets manager and bcrypt hashing.
 """
 
+# Ensure the project root (parent of this file's directory) is on sys.path so
+# that "from src.xxx import ..." works whether Streamlit is launched from the
+# project root or from the app/ sub-directory.
+import sys
+from pathlib import Path as _Path
+
+_PROJECT_ROOT = _Path(__file__).resolve().parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
 import hashlib
 import json
 import tempfile
