@@ -14,7 +14,8 @@ import json
 from langchain_sarvam import ChatSarvam
 
 from src.config import load_config
-from src.generate.prompts import CV_SUGGESTION_PROMPT, MATCH_EXPLANATION_PROMPT
+from src.generate.prompts import CV_SUGGESTION_PROMPT, MATCH_EXPLANATION_PROMPT, RESUME_REWRITE_PROMPT
+from src.llm_utils import invoke_with_retry
 
 _llm = None
 
@@ -42,7 +43,7 @@ def suggest_improvements(resume: dict, job: dict) -> str:
         job_title=job.get("title", ""),
         job_description=job.get("description", ""),
     )
-    return get_llm().invoke(messages).content
+    return invoke_with_retry(get_llm(), messages).content
 
 
 def explain_match(resume: dict, job: dict) -> str:
@@ -52,4 +53,19 @@ def explain_match(resume: dict, job: dict) -> str:
         job_title=job.get("title", ""),
         job_description=job.get("description", ""),
     )
-    return get_llm().invoke(messages).content
+    return invoke_with_retry(get_llm(), messages).content
+
+
+def rewrite_resume_for_job(resume: dict, job: dict) -> str:
+    """
+    Stretch goal: 'rewrite my resume for this job'.
+
+    Returns a tailored summary/skills/experience rewrite grounded strictly in
+    facts already present in `resume` -- never invents new experience.
+    """
+    messages = RESUME_REWRITE_PROMPT.format_messages(
+        resume_json=_resume_json(resume),
+        job_title=job.get("title", ""),
+        job_description=job.get("description", ""),
+    )
+    return invoke_with_retry(get_llm(), messages).content

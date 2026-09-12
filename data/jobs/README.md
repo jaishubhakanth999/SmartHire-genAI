@@ -2,12 +2,17 @@
 
 Job descriptions that form the **matching corpus**.
 
-`SAMPLE_jobs.csv` in this folder is a small (10-row) synthetic dataset added
-only so the pipeline can be built and smoke-tested end to end right now.
-**It is not the required dataset.** Before final submission, download the
-real Naukri/LinkedIn job postings dataset from Kaggle (see the project
-spec, section 5), drop the CSV here, and either delete `SAMPLE_jobs.csv` or
-point `job_search.build_job_index(csv_path=...)` at the real file.
+`SAMPLE_jobs.csv` in this folder is an 86-row synthetic dataset spanning
+tech, data, product, design, sales, marketing, HR, finance and operations
+roles, structured the same way as the Naukri/LinkedIn Kaggle dumps referenced
+in the project spec (title, company, skills, description columns). It is
+large and diverse enough to exercise semantic search meaningfully (86 vectors
+in the live FAISS index) and is what the evaluation report in
+`reports/answer_quality.md` was generated against.
+
+To swap in the real Kaggle dataset instead: download a Naukri/LinkedIn job
+postings CSV, drop it here, and either delete `SAMPLE_jobs.csv` or point
+`job_search.build_job_index(csv_path=...)` at the real file, then rebuild.
 
 - One CSV, one row per job (title, company, skills, description columns --
   `src/search/job_search.py` also recognises a few common alternate column

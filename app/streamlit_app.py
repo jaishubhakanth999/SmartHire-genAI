@@ -27,7 +27,7 @@ from pathlib import Path
 import streamlit as st
 
 from src.config import load_config
-from src.generate.cv_suggestions import explain_match, suggest_improvements
+from src.generate.cv_suggestions import explain_match, rewrite_resume_for_job, suggest_improvements
 from src.mentor.rag_chain import ask_mentor, build_mentor_index
 from src.parsing.resume_parser import parse_resume, to_search_text
 from src.safety import guardrails
@@ -231,7 +231,7 @@ def _resume_tab():
                 st.markdown(f"**Required skills:** {job['skills']}")
             st.markdown(job["description"])
 
-            c1, c2 = st.columns(2)
+            c1, c2, c3 = st.columns(3)
             with c1:
                 if st.button("💡 Explain this match", key=f"explain_{i}"):
                     with st.spinner("Asking the LLM…"):
@@ -240,6 +240,10 @@ def _resume_tab():
                 if st.button("✏️ CV improvement suggestions", key=f"suggest_{i}"):
                     with st.spinner("Asking the LLM…"):
                         st.success(suggest_improvements(resume, job))
+            with c3:
+                if st.button("🔄 Rewrite my resume for this job", key=f"rewrite_{i}"):
+                    with st.spinner("Rewriting with the LLM…"):
+                        st.markdown(rewrite_resume_for_job(resume, job))
 
 
 # ---------------------------------------------------------------------------

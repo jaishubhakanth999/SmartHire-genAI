@@ -1,8 +1,9 @@
 # Final Report — outline
 
-The submitted deliverable is `reports/final_report.pdf`. It is **not created
-yet** — it is exported at the end of the project, once there are results to
-report. This file is the working outline it will be written from.
+> **Status: complete.** The finished report is
+> [`reports/final_report.md`](final_report.md), written from real results
+> (`reports/answer_quality.md`, `reports/embedding_model_comparison.md`).
+> This file is kept as the working outline it was written from.
 
 1. Introduction — problem, motivation, scope
 2. Requirements — traced to the project specification

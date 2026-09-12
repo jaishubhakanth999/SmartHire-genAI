@@ -17,6 +17,7 @@ from langchain_sarvam import ChatSarvam
 
 from src.config import load_config
 from src.generate.prompts import MENTOR_RAG_PROMPT
+from src.llm_utils import invoke_with_retry
 from src.safety import guardrails
 from src.search.embed import build_index, index_exists, load_index
 
@@ -113,7 +114,7 @@ def ask_mentor(question: str, history: Optional[List[Dict[str, str]]] = None) ->
         history=_format_history(history),
         question=question,
     )
-    answer = llm.invoke(messages).content
+    answer = invoke_with_retry(llm, messages).content
 
     is_valid_output, out_reason = guardrails.check_output(answer)
     if not is_valid_output:

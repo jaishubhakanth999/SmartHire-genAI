@@ -60,6 +60,32 @@ CV_SUGGESTION_PROMPT = ChatPromptTemplate.from_messages(
     ]
 )
 
+RESUME_REWRITE_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a career coach rewriting a candidate's resume content to target a "
+            "specific job. Use ONLY facts already present in the candidate's profile -- "
+            "never invent employers, dates, skills, or achievements. Rewrite for clarity, "
+            "impact, and alignment with the target job's language, not to fabricate a "
+            "stronger candidate than the facts support.",
+        ),
+        (
+            "human",
+            "CANDIDATE PROFILE (JSON):\n{resume_json}\n\n"
+            "TARGET JOB:\nTitle: {job_title}\nDescription: {job_description}\n\n"
+            "Produce a tailored resume section in this exact structure:\n"
+            "1. PROFESSIONAL SUMMARY -- 2-3 sentences targeted at this role.\n"
+            "2. SKILLS -- a reordered/regrouped list emphasizing skills relevant to this job "
+            "(only skills already in the candidate's profile).\n"
+            "3. EXPERIENCE -- rewrite each existing role's bullet points to foreground "
+            "achievements relevant to this job, using stronger action verbs and quantifying "
+            "impact only where the original description already implies a number or scale.\n"
+            "Do not add an Education section or invent new experience entries.",
+        ),
+    ]
+)
+
 MATCH_EXPLANATION_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
@@ -105,6 +131,7 @@ MENTOR_RAG_PROMPT = ChatPromptTemplate.from_messages(
 _PROMPTS = {
     "resume_parse": RESUME_PARSE_PROMPT,
     "cv_suggestion": CV_SUGGESTION_PROMPT,
+    "resume_rewrite": RESUME_REWRITE_PROMPT,
     "match_explanation": MATCH_EXPLANATION_PROMPT,
     "mentor_system": MENTOR_SYSTEM_PROMPT,
     "mentor_rag": MENTOR_RAG_PROMPT,

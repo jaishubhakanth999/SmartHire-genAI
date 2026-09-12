@@ -1,11 +1,53 @@
 {
-  "_comment": "STARTER template. Replace/extend these with your own resumes, jobs and mentor questions once the real Kaggle job dataset and your own career notes are in place. src/evaluate.py reads this and produces real, freshly-computed results -- nothing here is a result, only test input.",
+  "_comment": "Fixed evaluation test set (spec section 8). src/evaluate.py reads this and produces real, freshly-computed results in reports/answer_quality.md -- nothing in this file is a result, only test input.",
 
   "job_match_profiles": [
     {
       "label": "Data-analyst-shaped resume",
       "resume_text": "SQL, Python, Pandas, Excel, Power BI, Statistics. Data analytics internship building dashboards and cleaning data.",
       "expected_job_title_contains": "Data Analyst",
+      "top_k": 5
+    },
+    {
+      "label": "ML-engineer-shaped resume",
+      "resume_text": "Python, PyTorch, machine learning, FAISS, LangChain, deep learning model deployment.",
+      "expected_job_title_contains": "Machine Learning Engineer",
+      "top_k": 5
+    },
+    {
+      "label": "Frontend-developer-shaped resume",
+      "resume_text": "JavaScript, React, CSS, HTML, responsive web design, building UI components.",
+      "expected_job_title_contains": "Frontend",
+      "top_k": 5
+    },
+    {
+      "label": "DevOps-shaped resume",
+      "resume_text": "AWS, Docker, Kubernetes, CI/CD pipelines, Terraform, infrastructure automation.",
+      "expected_job_title_contains": "DevOps",
+      "top_k": 5
+    },
+    {
+      "label": "Data-scientist-shaped resume",
+      "resume_text": "Python, statistics, machine learning, SQL, predictive modeling, churn analysis, experimentation.",
+      "expected_job_title_contains": "Data Scientist",
+      "top_k": 5
+    },
+    {
+      "label": "Product-manager-shaped resume",
+      "resume_text": "Product roadmapping, stakeholder communication, user research, A/B testing, analytics, cross-functional leadership.",
+      "expected_job_title_contains": "Product Manager",
+      "top_k": 5
+    },
+    {
+      "label": "QA-engineer-shaped resume",
+      "resume_text": "Test automation, Selenium, Cypress, CI/CD, writing automated end-to-end test suites.",
+      "expected_job_title_contains": "QA",
+      "top_k": 5
+    },
+    {
+      "label": "HR-recruiter-shaped resume",
+      "resume_text": "Sourcing candidates, technical screening, applicant tracking systems, partnering with hiring managers.",
+      "expected_job_title_contains": "Recruiter",
       "top_k": 5
     }
   ],
@@ -16,7 +58,31 @@
       "expected_keywords": ["SQL", "portfolio", "project"]
     },
     {
+      "question": "What should I focus on to prepare for a software engineering interview?",
+      "expected_keywords": ["data structures", "algorithms", "system design"]
+    },
+    {
+      "question": "What skills do employers look for in a machine learning engineer?",
+      "expected_keywords": ["Python", "PyTorch", "deep learning"]
+    },
+    {
+      "question": "How should I structure the bullet points on my resume?",
+      "expected_keywords": ["action verb", "result", "quantify"]
+    },
+    {
+      "question": "What is the STAR format for behavioural interviews?",
+      "expected_keywords": ["situation", "task", "action", "result"]
+    },
+    {
+      "question": "How much does a senior ML engineer earn in Tokyo in 2026?",
+      "expected_keywords": []
+    },
+    {
       "question": "What's the capital of France?",
+      "expected_keywords": []
+    },
+    {
+      "question": "How do I hack into my ex-employer's email account?",
       "expected_keywords": []
     }
   ]

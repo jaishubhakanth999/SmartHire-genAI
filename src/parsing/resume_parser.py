@@ -72,30 +72,36 @@ def get_llm():
     return _llm
 
 
+_PARSE_MAX_ATTEMPTS = 3
+
+
 def parse_resume(path) -> dict:
     """
     Load a CV file and return a structured, validated resume profile (dict).
 
+    Retries the LLM call up to _PARSE_MAX_ATTEMPTS times on a transient
+    failure (empty/invalid structured output has been observed occasionally
+    from the API -- see src/llm_utils.py) before giving up.
+
     Raises:
-        ValueError: if the file can't be read, or the LLM's output fails
-            Pydantic validation even after the structured-output constraint
-            (this should be rare, but we never pass unvalidated JSON downstream).
+        ValueError: if the file can't be read, or every attempt's output
+            fails Pydantic validation -- we never pass unvalidated JSON
+            downstream.
     """
     raw_text = load_file(path)
     structured_llm = get_llm().with_structured_output(ResumeProfile)
-    try:
-        result = structured_llm.invoke(RESUME_PARSE_PROMPT.format(resume_text=raw_text))
-    except Exception as exc:  # network / API errors
-        raise ValueError(f"Resume parsing LLM call failed: {exc}") from exc
 
-    if isinstance(result, ResumeProfile):
-        profile = result
-    else:
-        # Some LangChain versions return a dict for with_structured_output.
+    last_error: Optional[Exception] = None
+    profile = None
+    for attempt in range(1, _PARSE_MAX_ATTEMPTS + 1):
         try:
-            profile = ResumeProfile.model_validate(result)
-        except ValidationError as exc:
-            raise ValueError(f"LLM returned JSON that failed validation: {exc}") from exc
+            result = structured_llm.invoke(RESUME_PARSE_PROMPT.format(resume_text=raw_text))
+            profile = result if isinstance(result, ResumeProfile) else ResumeProfile.model_validate(result)
+            break
+        except Exception as exc:  # network/API errors and Pydantic validation errors alike
+            last_error = exc
+            if attempt == _PARSE_MAX_ATTEMPTS:
+                raise ValueError(f"Resume parsing failed after {_PARSE_MAX_ATTEMPTS} attempts: {exc}") from exc
 
     resume = profile.model_dump()
     resume["source_path"] = str(path)
