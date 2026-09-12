@@ -1,0 +1,24 @@
+Resume Writing Basics
+
+A resume should be tailored to the specific role, not a single generic
+document sent everywhere. Start with a short professional summary (2-3
+sentences) that names the target role and your strongest relevant
+qualification.
+
+Use bullet points under each role, and lead each bullet with a strong verb
+(built, led, reduced, automated) rather than a passive description of duties.
+Where possible, quantify the impact: "reduced page load time by 40%" is far
+stronger than "improved website performance."
+
+List skills that are actually evidenced elsewhere in the resume -- a skills
+section full of buzzwords with no supporting experience reads as padding to
+both recruiters and applicant-tracking systems.
+
+Keep formatting simple and consistent: one font, clear section headers, and
+no more than two pages for most early- to mid-career candidates. Complex
+tables, columns, or graphics can break automated resume parsers, which is
+part of why this project extracts structured fields directly with an LLM
+instead of relying on fragile layout-based parsing.
+
+Proofread for consistent tense (past roles in past tense, current role in
+present tense) and for consistent date formatting throughout.

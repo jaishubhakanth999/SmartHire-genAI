@@ -1,0 +1,24 @@
+Switching Into a Data Analyst Role
+
+Data analyst roles typically expect comfort with SQL, spreadsheet or
+dataframe-based analysis (Excel or pandas), one visualization tool (Power BI,
+Tableau, or a plotting library), and basic statistics -- means, distributions,
+correlation versus causation, and simple hypothesis testing.
+
+If you are switching from an unrelated field, the fastest credible path is
+usually: (1) learn SQL well enough to write joins and aggregations
+comfortably, (2) build two or three small end-to-end projects using public
+datasets that mirror the kind of questions the target industry asks, (3)
+learn to present findings clearly, since communicating an insight matters as
+much as finding it, and (4) reframe existing experience in analytical terms
+-- for example, "tracked and reported weekly sales performance" is a data
+analysis story even if the original job title was not "analyst."
+
+A portfolio of a few well-documented projects (with a clear question, the
+data source, the method, and the conclusion) is usually more convincing to
+hiring managers than a certificate alone, though certificates can help pass
+initial resume screens.
+
+Common interview formats include a SQL screen, a take-home dataset analysis,
+and a walkthrough of a past project where you explain your reasoning, not
+just your final chart.
