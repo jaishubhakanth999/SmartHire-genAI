@@ -1,4 +1,4 @@
-"""Resume upload, history, deletion, parsing, and job matching."""
+"""Resume upload, history, deletion, AI parsing, and AI job matching."""
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
@@ -40,7 +40,7 @@ async def resume_matches(resume_id: str, user: CurrentUser = Depends(get_current
     try:
         matches = search_jobs(to_search_text(resume["parsed"]))
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Job search failed: {exc}") from exc
+        raise HTTPException(status_code=502, detail=f"AI job matching failed: {exc}") from exc
     return {
         "resume": {
             "id": resume["id"],
@@ -84,6 +84,11 @@ async def upload_resume(
     parsed = result["parsed"]
     resume_row = insert_resume(user.id, file.filename, result["raw_text"], parsed)
 
+    try:
+        matches = search_jobs(to_search_text(parsed))
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"AI job matching failed: {exc}") from exc
+
     return {
         "resume": {
             "id": resume_row["id"],
@@ -91,5 +96,5 @@ async def upload_resume(
             "parsed": parsed,
             "created_at": resume_row["created_at"],
         },
-        "matches": [],
+        "matches": matches,
     }
