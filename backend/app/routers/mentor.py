@@ -68,13 +68,13 @@ async def chat(req: MentorChatRequest, user: CurrentUser = Depends(get_current_u
     session_id = session["id"]
     prior_messages = list_chat_messages(session_id)
     history = _history_pairs(prior_messages)
-    insert_chat_message(session_id, "user", redact_pii(req.message))
 
     try:
         result = ask_mentor(req.message, history=history)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Mentor service failed: {exc}") from exc
+        raise HTTPException(status_code=502, detail="Mentor service is temporarily unavailable. Please try again.") from exc
 
+    insert_chat_message(session_id, "user", redact_pii(req.message))
     insert_chat_message(
         session_id,
         "assistant",
