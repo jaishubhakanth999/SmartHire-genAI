@@ -48,24 +48,33 @@ export default function DashboardPage() {
 
   async function selectResume(item: ResumeRecord) {
     setResume(item);
+    setMatches([]);
+    setCvHistory([]);
     setLoadingMatches(true);
     setLoadingCvHistory(true);
     setError(null);
-    try {
-      const [matchData, cvData] = await Promise.all([
-        apiGet(`/api/resumes/${item.id}/matches`),
-        apiGet(`/api/cv/history/${item.id}`),
-      ]);
-      setMatches((matchData.matches || []) as JobMatch[]);
-      setCvHistory((cvData.items || []) as CVHistoryItem[]);
-    } catch (e) {
-      setMatches([]);
-      setCvHistory([]);
-      setError((e as Error).message);
-    } finally {
-      setLoadingMatches(false);
-      setLoadingCvHistory(false);
+
+    const [matchResult, cvResult] = await Promise.allSettled([
+      apiGet(`/api/resumes/${item.id}/matches`),
+      apiGet(`/api/cv/history/${item.id}`),
+    ]);
+
+    const errors: string[] = [];
+    if (matchResult.status === "fulfilled") {
+      setMatches((matchResult.value.matches || []) as JobMatch[]);
+    } else {
+      errors.push(`Job matching: ${(matchResult.reason as Error).message}`);
     }
+
+    if (cvResult.status === "fulfilled") {
+      setCvHistory((cvResult.value.items || []) as CVHistoryItem[]);
+    } else {
+      errors.push(`CV history: ${(cvResult.reason as Error).message}`);
+    }
+
+    if (errors.length > 0) setError(errors.join(" "));
+    setLoadingMatches(false);
+    setLoadingCvHistory(false);
   }
 
   useEffect(() => {
