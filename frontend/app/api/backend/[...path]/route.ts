@@ -55,7 +55,9 @@ export async function handler(
       }
     });
 
-    return new NextResponse(response.body, {
+    const responseBody = await response.arrayBuffer();
+
+    return new NextResponse(responseBody, {
       status: response.status,
       statusText: response.statusText,
       headers: responseHeaders,
