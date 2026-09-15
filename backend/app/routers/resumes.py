@@ -41,7 +41,15 @@ async def resume_matches(resume_id: str, user: CurrentUser = Depends(get_current
         matches = search_jobs(to_search_text(resume["parsed"]))
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Job search failed: {exc}") from exc
-    return {"resume": {"id": resume["id"], "filename": resume["filename"], "parsed": resume["parsed"], "created_at": resume["created_at"]}, "matches": matches}
+    return {
+        "resume": {
+            "id": resume["id"],
+            "filename": resume["filename"],
+            "parsed": resume["parsed"],
+            "created_at": resume["created_at"],
+        },
+        "matches": matches,
+    }
 
 
 @router.delete("/{resume_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -70,14 +78,19 @@ async def upload_resume(
         result = parse_resume_upload(file.filename, data)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"AI resume parsing failed: {exc}") from exc
 
     parsed = result["parsed"]
     resume_row = insert_resume(user.id, file.filename, result["raw_text"], parsed)
 
+    # The candidate details shown immediately after upload come directly from Sarvam.
+    # Semantic embedding search is intentionally not part of the upload critical path.
+    # This prevents the resume upload from hanging while loading a local embedding model.
     try:
         matches = search_jobs(to_search_text(parsed))
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Job search failed: {exc}") from exc
+    except Exception:
+        matches = []
 
     return {
         "resume": {
