@@ -14,8 +14,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"  # served via fastembed (ONNX, no torch)
-EMBEDDING_DIMENSIONS = 384  # must match the vector(384) columns in supabase/migrations
+DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+EMBEDDING_DIMENSIONS = 384
+DEFAULT_LLM_MODEL = "sarvam-105b"
 
 
 @dataclass(frozen=True)
@@ -43,11 +44,13 @@ class Settings:
     def require_llm(self) -> None:
         if not self.llm_api_key:
             raise RuntimeError(
-                "LLM_API_KEY is not set. Copy backend/.env.example to backend/.env "
-                "and fill in your Sarvam AI API key."
+                "Sarvam AI is not configured. Set LLM_API_KEY (or the legacy "
+                "SARVAM_API_KEY) in the backend environment."
             )
         if not self.llm_model:
-            raise RuntimeError("LLM_MODEL is not set in backend/.env (e.g. 'sarvam-105b').")
+            raise RuntimeError(
+                "LLM_MODEL is not configured. The backend default is sarvam-105b."
+            )
 
     def require_supabase(self) -> None:
         if not self.supabase_url or not self.supabase_service_role_key:
@@ -73,6 +76,14 @@ def _get_int(name: str, default: int) -> int:
         raise ValueError(f"Environment variable {name}='{raw}' is not a valid integer.")
 
 
+def _first_env(*names: str) -> Optional[str]:
+    for name in names:
+        value = os.getenv(name)
+        if value and value.strip():
+            return value.strip()
+    return None
+
+
 def get_settings() -> Settings:
     chunk_size = _get_int("CHUNK_SIZE", 1000)
     chunk_overlap = _get_int("CHUNK_OVERLAP", 200)
@@ -90,8 +101,8 @@ def get_settings() -> Settings:
         supabase_url=os.getenv("SUPABASE_URL", ""),
         supabase_service_role_key=os.getenv("SUPABASE_SERVICE_ROLE_KEY", ""),
         supabase_jwt_secret=os.getenv("SUPABASE_JWT_SECRET", ""),
-        llm_api_key=os.getenv("LLM_API_KEY") or None,
-        llm_model=os.getenv("LLM_MODEL") or None,
+        llm_api_key=_first_env("LLM_API_KEY", "SARVAM_API_KEY"),
+        llm_model=_first_env("LLM_MODEL", "SARVAM_MODEL") or DEFAULT_LLM_MODEL,
         embedding_model=os.getenv("EMBEDDING_MODEL") or DEFAULT_EMBEDDING_MODEL,
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
