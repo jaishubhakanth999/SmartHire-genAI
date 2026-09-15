@@ -78,11 +78,14 @@ export default function MentorPage() {
       const data = await apiPostJson("/api/mentor/chat", { message: question, session_id: sessionId });
       setSessionId(data.session_id);
       setMessages((prev) => [...prev, { role: "assistant", content: data.answer, sources: data.sources, grounded: data.grounded, blocked: data.blocked }]);
-      await loadSessions();
+      try {
+        await loadSessions();
+      } catch {
+        // The answer is already usable; session-list refresh should not fail the chat.
+      }
     } catch (e) {
-      const message = (e as Error).message;
-      setError(message);
-      setMessages((prev) => [...prev, { role: "assistant", content: message }]);
+      setError((e as Error).message);
+      setMessages((prev) => prev.slice(0, -1));
     } finally {
       setSending(false);
     }
@@ -130,7 +133,7 @@ export default function MentorPage() {
           </div>
 
           <form onSubmit={(e) => { e.preventDefault(); void send(); }} className="mt-5 flex gap-2 border-t border-slate-100 pt-5">
-            <input value={input} onChange={(e) => setInput(e.target.value)} disabled={sending} placeholder="Ask a career question…" className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 disabled:bg-slate-50" />
+            <input value={input} onChange={(e) => setInput(e.target.value)} disabled={sending} maxLength={2000} placeholder="Ask a career question…" className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 disabled:bg-slate-50" />
             <button type="submit" disabled={sending || !input.trim()} className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50">Send</button>
           </form>
         </section>
