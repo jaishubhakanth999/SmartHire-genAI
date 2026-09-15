@@ -34,7 +34,7 @@ export default function ResumeUploader({ onParsed }: { onParsed: (resume: Resume
       const form = new FormData();
       form.append("file", file);
       const data = await apiPostForm("/api/resumes", form);
-      onParsed(data.resume, data.matches);
+      onParsed(data.resume, data.matches || []);
     } catch (e) {
       setError((e as Error).message || "Could not process this resume.");
     } finally {
@@ -56,7 +56,7 @@ export default function ResumeUploader({ onParsed }: { onParsed: (resume: Resume
       >
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-3xl shadow-sm ring-1 ring-slate-200 group-hover:scale-105">{uploading ? "⏳" : "📄"}</div>
         <p className="mt-5 text-base font-bold text-slate-800">{uploading ? "Analyzing your resume…" : fileName || "Drop your resume here"}</p>
-        <p className="mt-2 text-sm text-slate-500">{uploading ? "Parsing profile and finding relevant opportunities" : "or click to browse · PDF or DOCX · up to 10 MB"}</p>
+        <p className="mt-2 text-sm text-slate-500">{uploading ? "Sarvam is extracting and validating your profile" : "or click to browse · PDF or DOCX · up to 10 MB"}</p>
         <input ref={inputRef} type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void handleFile(file); e.currentTarget.value = ""; }} />
       </div>
       {error && <div role="alert" className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{error}</div>}
