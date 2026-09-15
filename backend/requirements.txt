@@ -10,11 +10,7 @@ python-multipart>=0.0.9
 supabase>=2.7.0
 pyjwt>=2.9.0
 
-# Direct Sarvam AI client
-
-# LangChain compatibility used by CV services
-langchain-core>=0.2.0
-langchain-sarvam>=0.1.2
+# LangChain text splitting used by the admin knowledge-note loader
 langchain-text-splitters>=0.2.0
 
 # Document parsing
