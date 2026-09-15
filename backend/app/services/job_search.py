@@ -40,10 +40,15 @@ def search_jobs(resume_search_text: str, top_k: int | None = None) -> List[Dict[
     ]
     payload = chat_json(messages, max_tokens=3000)
     raw = payload.get("matches", []) if isinstance(payload, dict) else []
+    if not isinstance(raw, list):
+        raw = []
+
     by_id = {str(job.get("id")): job for job in jobs}
     results: List[Dict[str, Any]] = []
 
     for item in raw:
+        if not isinstance(item, dict):
+            continue
         job_id = str(item.get("id", ""))
         job = by_id.get(job_id)
         if job is None:
