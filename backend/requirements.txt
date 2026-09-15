@@ -10,11 +10,12 @@ python-multipart>=0.0.9
 supabase>=2.7.0
 pyjwt>=2.9.0
 
-# Sarvam AI direct REST client helpers
+# Direct Sarvam AI client
 
-# Existing LangChain support used by resume parsing compatibility path
+# LangChain compatibility used by CV services
 langchain-core>=0.2.0
 langchain-sarvam>=0.1.2
+langchain-text-splitters>=0.2.0
 
 # Document parsing
 pypdf>=4.2.0
