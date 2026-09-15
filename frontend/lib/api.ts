@@ -32,16 +32,28 @@ async function handle(res: Response) {
     }
     throw new Error(friendlyError(res.status, detail));
   }
-  if (res.status === 200 || res.status === 201) {
-    const contentType = res.headers.get("content-type") || "";
-    if (contentType.includes("application/json")) return res.json();
-  }
+  const contentType = res.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) return res.json();
   return null;
 }
 
-async function request(path: string, init: RequestInit = {}) {
+async function request(path: string, init: RequestInit = {}, allowRefresh = true) {
+  const supabase = createClient();
   const headers = { ...(await authHeaders()), ...(init.headers || {}) };
   const res = await fetch(`${API_URL}${path}`, { ...init, headers });
+
+  if (res.status === 401 && allowRefresh) {
+    const { data, error } = await supabase.auth.refreshSession();
+    if (!error && data.session?.access_token) {
+      const refreshedHeaders = {
+        ...(init.headers || {}),
+        Authorization: `Bearer ${data.session.access_token}`,
+      };
+      const retry = await fetch(`${API_URL}${path}`, { ...init, headers: refreshedHeaders });
+      return handle(retry);
+    }
+  }
+
   return handle(res);
 }
 
