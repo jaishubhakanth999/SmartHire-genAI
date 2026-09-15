@@ -2,7 +2,7 @@
 
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class JobMatchOut(BaseModel):
@@ -26,6 +26,10 @@ class ResumeUploadResponse(BaseModel):
     matches: List[JobMatchOut]
 
 
+class ResumeListResponse(BaseModel):
+    resumes: List[ResumeOut]
+
+
 class CVActionRequest(BaseModel):
     resume_id: str
     job_id: str
@@ -35,8 +39,17 @@ class CVActionResponse(BaseModel):
     content: str
 
 
+class CVHistoryItem(BaseModel):
+    id: str
+    resume_id: str
+    job_id: Optional[str] = None
+    kind: str
+    content: str
+    created_at: str
+
+
 class MentorChatRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1, max_length=2000)
     session_id: Optional[str] = None
 
 
@@ -48,20 +61,26 @@ class MentorChatResponse(BaseModel):
     blocked: bool = False
 
 
-class MentorHistoryMessage(BaseModel):
-    role: str
-    content: str
-    sources: List[str] = []
-    grounded: Optional[bool] = None
-    blocked: Optional[bool] = None
+class MentorSessionOut(BaseModel):
+    id: str
+    title: Optional[str] = None
     created_at: str
 
 
+class MentorSessionDetail(BaseModel):
+    id: str
+    title: Optional[str] = None
+    created_at: str
+    messages: List[dict]
+
+
 class AdminJobIn(BaseModel):
-    title: str
-    company: Optional[str] = ""
-    skills: Optional[str] = ""
-    description: str
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    title: str = Field(min_length=2, max_length=160)
+    company: Optional[str] = Field(default="", max_length=160)
+    skills: Optional[str] = Field(default="", max_length=1000)
+    description: str = Field(min_length=10, max_length=10000)
 
 
 class AdminJobOut(BaseModel):
@@ -73,8 +92,10 @@ class AdminJobOut(BaseModel):
 
 
 class AdminCareerNoteIn(BaseModel):
-    filename: str
-    content: str
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    filename: str = Field(min_length=1, max_length=255)
+    content: str = Field(min_length=20, max_length=50000)
 
 
 class AdminCareerNoteChunkOut(BaseModel):
