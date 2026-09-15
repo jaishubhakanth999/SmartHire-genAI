@@ -4,9 +4,9 @@ Authentication.
 Responsibility: verify the Supabase-issued access token sent by the frontend
 and expose FastAPI dependencies for the current user and admin-only routes.
 
-Validation is performed against Supabase Auth's user endpoint rather than
-locally decoding with the legacy JWT secret. This remains compatible with
-Supabase signing-key rotation.
+Token validation is delegated to Supabase Auth rather than relying on the
+legacy JWT secret. This keeps the backend compatible with Supabase signing
+key changes and token rotation.
 """
 
 from dataclasses import dataclass
@@ -83,13 +83,7 @@ async def get_current_user(
         )
 
     user = _validate_token(credentials.credentials)
-    user_id = user.get("id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid session user.",
-        )
-
+    user_id = user["id"]
     profile = get_profile(user_id)
     role = profile.get("role", "user") if profile else "user"
     email = user.get("email") or (profile.get("email") if profile else None)
