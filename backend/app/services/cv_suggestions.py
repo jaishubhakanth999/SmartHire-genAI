@@ -1,62 +1,37 @@
-"""
-LLM-generated CV improvement suggestions, match explanations, and resume rewrites.
-
-Responsibility: given a parsed resume and a target job, call the LLM with the
-templates in prompts.py to produce concrete, actionable output.
-"""
+"""Direct Sarvam CV coaching actions."""
 
 import json
-from typing import Optional
 
-from langchain_sarvam import ChatSarvam
-
-from app.config import settings
-from app.services.llm_utils import invoke_with_retry, response_text
-from app.services.prompts import CV_SUGGESTION_PROMPT, MATCH_EXPLANATION_PROMPT, RESUME_REWRITE_PROMPT
-
-_llm: Optional[ChatSarvam] = None
-
-
-def get_llm() -> ChatSarvam:
-    global _llm
-    if _llm is None:
-        settings.require_llm()
-        _llm = ChatSarvam(
-            model=settings.llm_model,
-            api_key=settings.llm_api_key,
-            temperature=0.3,
-            max_tokens=4096,
-            reasoning_effort="low",
-        )
-    return _llm
+from app.services.sarvam_client import chat
 
 
 def _resume_json(parsed: dict) -> str:
-    return json.dumps(parsed, default=str)
+    return json.dumps(parsed, default=str, ensure_ascii=False)
+
+
+def _job_text(job: dict) -> str:
+    return f"Title: {job.get('title', '')}\nDescription: {job.get('description', '')}\nSkills: {job.get('skills', '')}"
 
 
 def suggest_improvements(parsed_resume: dict, job: dict) -> str:
-    messages = CV_SUGGESTION_PROMPT.format_messages(
-        resume_json=_resume_json(parsed_resume),
-        job_title=job.get("title", ""),
-        job_description=job.get("description", ""),
-    )
-    return response_text(invoke_with_retry(get_llm(), messages))
+    messages = [
+        {"role": "system", "content": "You are a practical CV coach. Use only facts in the supplied candidate profile. Never invent experience, employers, skills, dates or achievements."},
+        {"role": "user", "content": f"CANDIDATE PROFILE:\n{_resume_json(parsed_resume)}\n\nTARGET JOB:\n{_job_text(job)}\n\nGive: (1) missing or weakly evidenced skills, (2) 2-3 stronger rewrites of existing experience bullets using only supplied facts, and (3) a targeted 2-3 sentence summary."},
+    ]
+    return chat(messages, max_tokens=2500)
 
 
 def explain_match(parsed_resume: dict, job: dict) -> str:
-    messages = MATCH_EXPLANATION_PROMPT.format_messages(
-        resume_json=_resume_json(parsed_resume),
-        job_title=job.get("title", ""),
-        job_description=job.get("description", ""),
-    )
-    return response_text(invoke_with_retry(get_llm(), messages))
+    messages = [
+        {"role": "system", "content": "Explain a resume-to-job match using only the supplied facts. Do not invent overlap."},
+        {"role": "user", "content": f"CANDIDATE PROFILE:\n{_resume_json(parsed_resume)}\n\nJOB:\n{_job_text(job)}\n\nExplain in 3-5 clear bullet points why this role fits, and mention important gaps."},
+    ]
+    return chat(messages, max_tokens=1600)
 
 
 def rewrite_resume_for_job(parsed_resume: dict, job: dict) -> str:
-    messages = RESUME_REWRITE_PROMPT.format_messages(
-        resume_json=_resume_json(parsed_resume),
-        job_title=job.get("title", ""),
-        job_description=job.get("description", ""),
-    )
-    return response_text(invoke_with_retry(get_llm(), messages))
+    messages = [
+        {"role": "system", "content": "Rewrite resume content for the target job using ONLY facts already present in the candidate profile. Never fabricate facts or achievements."},
+        {"role": "user", "content": f"CANDIDATE PROFILE:\n{_resume_json(parsed_resume)}\n\nJOB:\n{_job_text(job)}\n\nProduce: PROFESSIONAL SUMMARY, SKILLS, EXPERIENCE. Keep every employer, date, skill and achievement grounded in the supplied profile."},
+    ]
+    return chat(messages, max_tokens=3000)
