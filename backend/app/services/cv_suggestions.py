@@ -11,7 +11,7 @@ from typing import Optional
 from langchain_sarvam import ChatSarvam
 
 from app.config import settings
-from app.services.llm_utils import invoke_with_retry
+from app.services.llm_utils import invoke_with_retry, response_text
 from app.services.prompts import CV_SUGGESTION_PROMPT, MATCH_EXPLANATION_PROMPT, RESUME_REWRITE_PROMPT
 
 _llm: Optional[ChatSarvam] = None
@@ -41,7 +41,7 @@ def suggest_improvements(parsed_resume: dict, job: dict) -> str:
         job_title=job.get("title", ""),
         job_description=job.get("description", ""),
     )
-    return invoke_with_retry(get_llm(), messages).content
+    return response_text(invoke_with_retry(get_llm(), messages))
 
 
 def explain_match(parsed_resume: dict, job: dict) -> str:
@@ -50,7 +50,7 @@ def explain_match(parsed_resume: dict, job: dict) -> str:
         job_title=job.get("title", ""),
         job_description=job.get("description", ""),
     )
-    return invoke_with_retry(get_llm(), messages).content
+    return response_text(invoke_with_retry(get_llm(), messages))
 
 
 def rewrite_resume_for_job(parsed_resume: dict, job: dict) -> str:
@@ -59,4 +59,4 @@ def rewrite_resume_for_job(parsed_resume: dict, job: dict) -> str:
         job_title=job.get("title", ""),
         job_description=job.get("description", ""),
     )
-    return invoke_with_retry(get_llm(), messages).content
+    return response_text(invoke_with_retry(get_llm(), messages))
