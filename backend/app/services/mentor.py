@@ -12,7 +12,7 @@ from app.config import settings
 from app.database import match_career_notes
 from app.services import guardrails
 from app.services.embeddings import embed_text
-from app.services.llm_utils import invoke_with_retry
+from app.services.llm_utils import invoke_with_retry, response_text
 from app.services.prompts import MENTOR_RAG_PROMPT
 
 _llm: Optional[ChatSarvam] = None
@@ -56,7 +56,7 @@ def ask_mentor(question: str, history: Optional[List[Dict[str, str]]] = None) ->
         history=_format_history(history),
         question=question,
     )
-    answer = invoke_with_retry(get_llm(), messages).content
+    answer = response_text(invoke_with_retry(get_llm(), messages))
 
     is_valid_output, out_reason = guardrails.check_output(answer)
     if not is_valid_output:
