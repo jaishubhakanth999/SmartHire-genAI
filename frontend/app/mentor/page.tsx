@@ -41,14 +41,7 @@ export default function MentorPage() {
     try {
       const data = (await apiGet(`/api/mentor/sessions/${id}`)) as SessionDetail;
       setSessionId(data.id);
-      setMessages(data.messages.map((message) => ({
-        id: message.id,
-        role: message.role,
-        content: message.content,
-        sources: message.sources,
-        grounded: message.grounded,
-        blocked: message.blocked,
-      })));
+      setMessages(data.messages.map((message) => ({ id: message.id, role: message.role, content: message.content, sources: message.sources, grounded: message.grounded, blocked: message.blocked })));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -84,18 +77,12 @@ export default function MentorPage() {
     try {
       const data = await apiPostJson("/api/mentor/chat", { message: question, session_id: sessionId });
       setSessionId(data.session_id);
-      setMessages((prev) => [...prev, {
-        role: "assistant",
-        content: data.answer,
-        sources: data.sources,
-        grounded: data.grounded,
-        blocked: data.blocked,
-      }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: data.answer, sources: data.sources, grounded: data.grounded, blocked: data.blocked }]);
       await loadSessions();
     } catch (e) {
       const message = (e as Error).message;
       setError(message);
-      setMessages((prev) => [...prev, { role: "assistant", content: `I couldn't complete that request. ${message}` }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: message }]);
     } finally {
       setSending(false);
     }
@@ -112,10 +99,7 @@ export default function MentorPage() {
           <div className="mt-4 space-y-2">
             {loadingSessions ? <p className="text-sm text-slate-400">Loading…</p> : sessions.length === 0 ? <p className="text-sm leading-6 text-slate-400">Your mentor conversations will be saved here.</p> : sessions.map((session) => (
               <div key={session.id} className={`rounded-2xl border p-3 ${sessionId === session.id ? "border-indigo-200 bg-indigo-50/60" : "border-slate-200"}`}>
-                <button className="w-full text-left" onClick={() => void openSession(session.id)}>
-                  <div className="line-clamp-2 text-sm font-bold text-slate-800">{session.title || "Career chat"}</div>
-                  <div className="mt-1 text-xs text-slate-400">{new Date(session.created_at).toLocaleString()}</div>
-                </button>
+                <button className="w-full text-left" onClick={() => void openSession(session.id)}><div className="line-clamp-2 text-sm font-bold text-slate-800">{session.title || "Career chat"}</div><div className="mt-1 text-xs text-slate-400">{new Date(session.created_at).toLocaleString()}</div></button>
                 <button onClick={() => void deleteSession(session.id)} className="mt-2 text-xs font-semibold text-rose-600 hover:text-rose-500">Delete</button>
               </div>
             ))}
@@ -125,7 +109,7 @@ export default function MentorPage() {
         <section className="flex min-h-[calc(100vh-112px)] flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           <div className="border-b border-slate-100 pb-5">
             <h2 className="text-2xl font-black text-slate-950">🤖 AI Career Mentor</h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Ask career questions and get answers directly from the SmartHire AI mentor. Your private conversation history is saved to your account.</p>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Ask career questions and get answers directly from Sarvam AI. Your private conversation history is saved to your account.</p>
           </div>
 
           {error && <div role="alert" className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{error}</div>}
