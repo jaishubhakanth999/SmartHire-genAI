@@ -20,6 +20,13 @@ def _load_resume_and_job(req: CVActionRequest, user: CurrentUser):
     return resume, job
 
 
+def _ai_failure(exc: Exception) -> HTTPException:
+    return HTTPException(
+        status_code=502,
+        detail=f"AI service failed: {exc}",
+    )
+
+
 @router.get("/history/{resume_id}")
 async def cv_history(resume_id: str, user: CurrentUser = Depends(get_current_user)):
     if get_resume(resume_id, user.id) is None:
@@ -30,22 +37,43 @@ async def cv_history(resume_id: str, user: CurrentUser = Depends(get_current_use
 @router.post("/suggestions", response_model=CVActionResponse)
 async def cv_suggestions_endpoint(req: CVActionRequest, user: CurrentUser = Depends(get_current_user)):
     resume, job = _load_resume_and_job(req, user)
-    content = suggest_improvements(resume["parsed"], job)
-    insert_cv_suggestion(resume["id"], job["id"], "suggestions", content)
-    return {"content": content}
+    try:
+        content = suggest_improvements(resume["parsed"], job)
+        if not content or not content.strip():
+            raise RuntimeError("AI returned an empty response.")
+        insert_cv_suggestion(resume["id"], job["id"], "suggestions", content)
+        return {"content": content}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise _ai_failure(exc) from exc
 
 
 @router.post("/rewrite", response_model=CVActionResponse)
 async def cv_rewrite_endpoint(req: CVActionRequest, user: CurrentUser = Depends(get_current_user)):
     resume, job = _load_resume_and_job(req, user)
-    content = rewrite_resume_for_job(resume["parsed"], job)
-    insert_cv_suggestion(resume["id"], job["id"], "rewrite", content)
-    return {"content": content}
+    try:
+        content = rewrite_resume_for_job(resume["parsed"], job)
+        if not content or not content.strip():
+            raise RuntimeError("AI returned an empty response.")
+        insert_cv_suggestion(resume["id"], job["id"], "rewrite", content)
+        return {"content": content}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise _ai_failure(exc) from exc
 
 
 @router.post("/explain", response_model=CVActionResponse)
 async def cv_explain_endpoint(req: CVActionRequest, user: CurrentUser = Depends(get_current_user)):
     resume, job = _load_resume_and_job(req, user)
-    content = explain_match(resume["parsed"], job)
-    insert_cv_suggestion(resume["id"], job["id"], "explanation", content)
-    return {"content": content}
+    try:
+        content = explain_match(resume["parsed"], job)
+        if not content or not content.strip():
+            raise RuntimeError("AI returned an empty response.")
+        insert_cv_suggestion(resume["id"], job["id"], "explanation", content)
+        return {"content": content}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise _ai_failure(exc) from exc
