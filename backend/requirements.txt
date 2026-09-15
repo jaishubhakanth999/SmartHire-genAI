@@ -1,34 +1,28 @@
 # SmartHire GenAI backend -- Python dependencies
 
-# --- Web framework ---
+# Web framework
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
 gunicorn>=22.0.0
 python-multipart>=0.0.9
 
-# --- Supabase ---
+# Supabase auth + storage
 supabase>=2.7.0
 pyjwt>=2.9.0
 
-# --- LLM (Sarvam AI) + orchestration ---
+# Sarvam AI direct REST client helpers
+
+# Existing LangChain support used by resume parsing compatibility path
 langchain-core>=0.2.0
 langchain-sarvam>=0.1.2
 
-# --- Embeddings (local, free, no API key, no torch -- ONNX runtime) ---
-fastembed>=0.3.0
-
-# --- Text splitting ---
-langchain-text-splitters>=0.2.0
-
-# --- Document parsing ---
+# Document parsing
 pypdf>=4.2.0
 python-docx>=1.1.0
 
-# --- Job dataset (scripts/seed_data.py) ---
+# Job dataset / seed scripts
 pandas>=2.2.0
 
-# --- Config ---
+# Config + validation
 python-dotenv>=1.0.0
-
-# --- Pydantic (FastAPI's request/response models) ---
 pydantic>=2.7.0
