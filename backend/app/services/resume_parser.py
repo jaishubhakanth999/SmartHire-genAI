@@ -3,14 +3,13 @@ Resume parsing.
 
 Responsibility: turn raw resume text into a clean, structured profile --
 name, contact info, skills, experience, education, target role -- using the
-LLM's structured-output mode, validated with Pydantic before anything
-downstream trusts it.
+LLM's structured-output mode, validated with Pydantic before anything downstream trusts it.
 """
 
 from typing import List, Optional
 
 from langchain_sarvam import ChatSarvam
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field
 
 from app.config import settings
 from app.services.loader import load_upload
@@ -49,42 +48,36 @@ def get_llm() -> ChatSarvam:
     global _llm
     if _llm is None:
         settings.require_llm()
-        # max_tokens is generous on purpose -- see the comment in
-        # app/services/cv_suggestions.py's get_llm() for why.
-        _llm = ChatSarvam(model=settings.llm_model, api_key=settings.llm_api_key, temperature=0, max_tokens=4096)
+        _llm = ChatSarvam(
+            model=settings.llm_model,
+            api_key=settings.llm_api_key,
+            temperature=0,
+            max_tokens=4096,
+            reasoning_effort="low",
+        )
     return _llm
 
 
 def parse_resume_upload(filename: str, data: bytes) -> dict:
-    """
-    Load an uploaded resume file's bytes and return a structured, validated
-    profile (dict) plus the raw extracted text.
-
-    Raises:
-        ValueError: if the file can't be read, or every attempt's LLM output
-            fails Pydantic validation.
-    """
     raw_text = load_upload(filename, data)
     structured_llm = get_llm().with_structured_output(ResumeProfile)
 
-    profile: Optional[ResumeProfile] = None
     last_error: Optional[Exception] = None
     for attempt in range(1, _MAX_ATTEMPTS + 1):
         try:
             result = structured_llm.invoke(RESUME_PARSE_PROMPT.format(resume_text=raw_text))
             profile = result if isinstance(result, ResumeProfile) else ResumeProfile.model_validate(result)
-            break
-        except Exception as exc:  # network/API errors and validation errors alike
+            return {"parsed": profile.model_dump(), "raw_text": raw_text}
+        except Exception as exc:
             last_error = exc
-            if attempt == _MAX_ATTEMPTS:
-                raise ValueError(f"Resume parsing failed after {_MAX_ATTEMPTS} attempts: {exc}") from exc
+            if attempt < _MAX_ATTEMPTS:
+                continue
+            raise ValueError(f"Resume parsing failed after {_MAX_ATTEMPTS} attempts: {exc}") from exc
 
-    assert profile is not None  # loop either sets profile or raises
-    return {"parsed": profile.model_dump(), "raw_text": raw_text}
+    raise ValueError(f"Resume parsing failed: {last_error}")
 
 
 def to_search_text(parsed: dict) -> str:
-    """Flatten a structured resume into the single string used for job matching."""
     parts = [parsed.get("target_role") or "", ", ".join(parsed.get("skills", []))]
     for exp in parsed.get("experience", []):
         parts.append(f"{exp.get('title', '')} at {exp.get('company', '')}: {exp.get('description') or ''}")
