@@ -1,19 +1,12 @@
-"""
-AI Career Mentor -- retrieval-augmented generation.
-
-Responsibility: embed the question, retrieve relevant chunks from the career_notes table via pgvector, assemble the RAG prompt, run guardrails, call the LLM, and return an answer with its source documents so every claim is traceable. Conversation history is passed in by the caller for multi-turn memory.
-"""
+"""Direct AI Career Mentor service without embeddings or RAG."""
 
 from typing import Any, Dict, List, Optional
 
 from langchain_sarvam import ChatSarvam
 
 from app.config import settings
-from app.database import match_career_notes
 from app.services import guardrails
-from app.services.embeddings import embed_text
 from app.services.llm_utils import invoke_with_retry, response_text
-from app.services.prompts import MENTOR_RAG_PROMPT
 
 _llm: Optional[ChatSarvam] = None
 
@@ -35,35 +28,65 @@ def get_llm() -> ChatSarvam:
 def _format_history(history: Optional[List[Dict[str, str]]]) -> str:
     if not history:
         return "(no earlier turns)"
-    lines = []
-    for turn in history:
-        lines.append(f"User: {turn.get('question', '')}")
-        lines.append(f"Mentor: {turn.get('answer', '')}")
-    return "\n".join(lines)
+    lines: list[str] = []
+    for turn in history[-8:]:
+        question = str(turn.get("question", "")).strip()
+        answer = str(turn.get("answer", "")).strip()
+        if question:
+            lines.append(f"User: {question}")
+        if answer:
+            lines.append(f"Mentor: {answer}")
+    return "\n".join(lines) or "(no earlier turns)"
 
 
 def ask_mentor(question: str, history: Optional[List[Dict[str, str]]] = None) -> Dict[str, Any]:
     is_valid, reason = guardrails.check_input(question)
     if not is_valid:
-        return {"answer": f"I can't help with that: {reason}", "sources": [], "blocked": True, "grounded": True}
+        return {
+            "answer": f"I can't help with that: {reason}",
+            "sources": [],
+            "blocked": True,
+            "grounded": True,
+        }
 
-    query_embedding = embed_text(question)
-    docs = match_career_notes(query_embedding, settings.top_k)
-    context = "\n\n".join(f"[{d.get('filename', 'unknown')}] {d.get('content', '')}" for d in docs)
+    messages = [
+        (
+            "system",
+            "You are SmartHire's AI Career Mentor. Give practical, clear and encouraging career "
+            "guidance for students and job seekers. You can answer questions about careers, skills, "
+            "learning roadmaps, interviews, job search, resumes, and professional development. "
+            "Use your general knowledge and the conversation history. Do not claim to have searched "
+            "the internet or accessed private documents. Do not invent facts about the user. If a "
+            "question is unrelated to career or professional development, politely redirect it to "
+            "a career-focused topic. Keep responses useful and reasonably concise."
+        ),
+        (
+            "human",
+            f"CONVERSATION HISTORY:\n{_format_history(history)}\n\nUSER QUESTION:\n{question}",
+        ),
+    ]
 
-    messages = MENTOR_RAG_PROMPT.format_messages(
-        context=context or "(no relevant documents found)",
-        history=_format_history(history),
-        question=question,
-    )
-    answer = response_text(invoke_with_retry(get_llm(), messages))
+    try:
+        response = invoke_with_retry(get_llm(), messages)
+        answer = response_text(response)
+    except Exception as exc:
+        raise RuntimeError(f"Sarvam AI request failed: {exc}") from exc
 
-    is_valid_output, out_reason = guardrails.check_output(answer)
+    if not answer:
+        raise RuntimeError("Sarvam AI returned an empty response.")
+
+    is_valid_output, reason = guardrails.check_output(answer)
     if not is_valid_output:
-        return {"answer": f"I can't share that response: {out_reason}", "sources": [], "blocked": True, "grounded": True}
+        return {
+            "answer": f"I can't share that response: {reason}",
+            "sources": [],
+            "blocked": True,
+            "grounded": True,
+        }
 
-    source_texts = [d.get("content", "") for d in docs]
-    grounded = guardrails.is_grounded(answer, source_texts)
-    sources = sorted({d.get("filename", "unknown") for d in docs})
-
-    return {"answer": answer, "sources": sources, "blocked": False, "grounded": grounded}
+    return {
+        "answer": answer,
+        "sources": [],
+        "grounded": True,
+        "blocked": False,
+    }
