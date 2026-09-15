@@ -24,6 +24,8 @@ class Settings:
     # --- Supabase ---
     supabase_url: str
     supabase_service_role_key: str
+    # Kept for backwards compatibility with existing Render environment settings.
+    # Authentication no longer depends on the legacy JWT secret.
     supabase_jwt_secret: str
 
     # --- LLM (Sarvam AI) ---
@@ -58,11 +60,6 @@ class Settings:
                 "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not set. Create a Supabase "
                 "project, run the migrations in supabase/migrations/, and fill in "
                 "backend/.env from backend/.env.example."
-            )
-        if not self.supabase_jwt_secret:
-            raise RuntimeError(
-                "SUPABASE_JWT_SECRET is not set. Find it in your Supabase project's "
-                "Settings -> API -> JWT Settings, and set it in backend/.env."
             )
 
 
