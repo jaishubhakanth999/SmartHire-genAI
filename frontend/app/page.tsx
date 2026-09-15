@@ -2,9 +2,9 @@ import Link from "next/link";
 
 const FEATURES = [
   { icon: "📄", title: "Resume intelligence", body: "Turn PDF or DOCX resumes into a structured, validated career profile." },
-  { icon: "🎯", title: "Semantic job matching", body: "Find opportunities by meaning and skills instead of relying on brittle keyword matches." },
+  { icon: "🎯", title: "AI job matching", body: "Use Sarvam AI to compare your profile with available opportunities and rank the strongest fits." },
   { icon: "✨", title: "CV copilot", body: "Get job-specific explanations, improvement suggestions, and fact-grounded rewrites." },
-  { icon: "🤖", title: "Career mentor", body: "Ask focused career questions and receive answers grounded in your curated knowledge base." },
+  { icon: "🤖", title: "Career mentor", body: "Ask focused career questions and receive practical answers directly from Sarvam AI." },
 ];
 
 export default function Home() {
@@ -21,14 +21,14 @@ export default function Home() {
               Build a smarter path from <span className="text-indigo-600">resume to opportunity.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-              SmartHire GenAI combines resume understanding, semantic job matching, explainable CV assistance, and a grounded career mentor into one hackathon-ready workflow.
+              SmartHire GenAI combines resume understanding, AI job matching, explainable CV assistance, and a direct Sarvam AI career mentor into one hackathon-ready workflow.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link href="/signup" className="rounded-xl bg-indigo-600 px-6 py-3.5 text-center text-sm font-bold text-white shadow-xl shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-500">Start matching →</Link>
               <Link href="/login" className="rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-center text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">Sign in</Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-5 text-xs font-semibold text-slate-500">
-              <span>✓ Explainable matches</span><span>✓ Grounded AI</span><span>✓ Secure auth</span><span>✓ Cloud deployed</span>
+              <span>✓ Explainable matches</span><span>✓ Direct Sarvam AI</span><span>✓ Secure auth</span><span>✓ Cloud deployed</span>
             </div>
           </div>
 
@@ -40,7 +40,7 @@ export default function Home() {
                 <div className="mt-2 flex items-center justify-between gap-4"><div><div className="font-bold">Data Analyst</div><div className="text-sm text-slate-500">Skills aligned with your profile</div></div><div className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-bold text-indigo-700">92%</div></div>
                 <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full w-[92%] rounded-full bg-indigo-600" /></div>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-3 text-xs"><div className="rounded-xl bg-white/10 p-4"><div className="text-slate-400">Resume</div><div className="mt-1 font-bold">Structured ✓</div></div><div className="rounded-xl bg-white/10 p-4"><div className="text-slate-400">Mentor</div><div className="mt-1 font-bold">Grounded ✓</div></div></div>
+              <div className="mt-3 grid grid-cols-2 gap-3 text-xs"><div className="rounded-xl bg-white/10 p-4"><div className="text-slate-400">Resume</div><div className="mt-1 font-bold">Structured ✓</div></div><div className="rounded-xl bg-white/10 p-4"><div className="text-slate-400">Mentor</div><div className="mt-1 font-bold">Sarvam ✓</div></div></div>
             </div>
           </div>
         </div>
