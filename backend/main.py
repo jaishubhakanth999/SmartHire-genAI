@@ -34,4 +34,9 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "supabase_configured": bool(settings.supabase_url and settings.supabase_service_role_key),
+        "llm_configured": bool(settings.llm_api_key and settings.llm_model),
+        "llm_model": settings.llm_model if settings.llm_api_key else None,
+    }
