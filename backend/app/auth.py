@@ -1,26 +1,21 @@
 """
 Authentication.
 
-Responsibility: verify the Supabase-issued JWT sent by the frontend on every
-API call (`Authorization: Bearer <access_token>`), and expose FastAPI
-dependencies that route handlers use to get the current user and to gate
-admin-only endpoints.
+Responsibility: verify the Supabase-issued access token sent by the frontend
+and expose FastAPI dependencies for the current user and admin-only routes.
 
-The frontend never talks to this backend for sign-in/sign-up -- that goes
-directly to Supabase Auth via supabase-js. This module only verifies the
-token Supabase already issued, using the project's JWT secret (Settings ->
-API -> JWT Settings in the Supabase dashboard).
+Token validation is delegated to Supabase Auth rather than relying on the
+legacy JWT secret. This keeps the backend compatible with Supabase's current
+signing-key system and token rotation.
 """
 
 from dataclasses import dataclass
 from typing import Optional
 
-import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.config import settings
-from app.database import get_profile
+from app.database import get_client, get_profile
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -29,40 +24,55 @@ _bearer = HTTPBearer(auto_error=False)
 class CurrentUser:
     id: str
     email: Optional[str]
-    role: str  # "user" or "admin"
+    role: str
 
 
-def _decode_token(token: str) -> dict:
+def _validate_token(token: str):
     try:
-        return jwt.decode(
-            token,
-            settings.supabase_jwt_secret,
-            algorithms=["HS256"],
-            audience="authenticated",
+        response = get_client().auth.get_user(token)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session.",
+        ) from exc
+
+    user = getattr(response, "user", None)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session.",
         )
-    except jwt.PyJWTError as exc:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token: {exc}") from exc
+    return user
 
 
 async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
 ) -> CurrentUser:
     if credentials is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing Authorization header.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing Authorization header.",
+        )
 
-    payload = _decode_token(credentials.credentials)
-    user_id = payload.get("sub")
+    user = _validate_token(credentials.credentials)
+    user_id = getattr(user, "id", None)
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has no subject.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid session user.",
+        )
 
     profile = get_profile(user_id)
     role = profile.get("role", "user") if profile else "user"
-    email = payload.get("email") or (profile.get("email") if profile else None)
+    email = getattr(user, "email", None) or (profile.get("email") if profile else None)
 
     return CurrentUser(id=user_id, email=email, role=role)
 
 
 async def require_admin(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
     if user.role != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required.",
+        )
     return user
