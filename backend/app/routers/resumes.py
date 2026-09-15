@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from app.auth import CurrentUser, get_current_user
 from app.database import delete_resume, get_resume, insert_resume, list_resumes
-from app.schemas import ResumeListResponse, ResumeOut, ResumeUploadResponse
+from app.schemas import ResumeListResponse, ResumeUploadResponse
 from app.services.job_search import search_jobs
 from app.services.resume_parser import parse_resume_upload, to_search_text
 
@@ -84,14 +84,6 @@ async def upload_resume(
     parsed = result["parsed"]
     resume_row = insert_resume(user.id, file.filename, result["raw_text"], parsed)
 
-    # The candidate details shown immediately after upload come directly from Sarvam.
-    # Semantic embedding search is intentionally not part of the upload critical path.
-    # This prevents the resume upload from hanging while loading a local embedding model.
-    try:
-        matches = search_jobs(to_search_text(parsed))
-    except Exception:
-        matches = []
-
     return {
         "resume": {
             "id": resume_row["id"],
@@ -99,5 +91,5 @@ async def upload_resume(
             "parsed": parsed,
             "created_at": resume_row["created_at"],
         },
-        "matches": matches,
+        "matches": [],
     }
