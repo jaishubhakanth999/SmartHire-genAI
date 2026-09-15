@@ -6,7 +6,6 @@ import { apiDelete, apiGet, apiPostJson } from "@/lib/api";
 import type { ChatMessage } from "@/types";
 
 type Session = { id: string; title?: string | null; created_at: string };
-
 type SessionDetail = Session & { messages: Array<ChatMessage & { created_at?: string }> };
 
 export default function MentorPage() {
@@ -94,7 +93,9 @@ export default function MentorPage() {
       }]);
       await loadSessions();
     } catch (e) {
-      setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${(e as Error).message}` }]);
+      const message = (e as Error).message;
+      setError(message);
+      setMessages((prev) => [...prev, { role: "assistant", content: `I couldn't complete that request. ${message}` }]);
     } finally {
       setSending(false);
     }
@@ -124,7 +125,7 @@ export default function MentorPage() {
         <section className="flex min-h-[calc(100vh-112px)] flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           <div className="border-b border-slate-100 pb-5">
             <h2 className="text-2xl font-black text-slate-950">🤖 AI Career Mentor</h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Ask focused career questions. Answers are grounded in SmartHire&apos;s career knowledge base and saved to your private conversation history.</p>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Ask career questions and get answers directly from the SmartHire AI mentor. Your private conversation history is saved to your account.</p>
           </div>
 
           {error && <div role="alert" className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{error}</div>}
@@ -136,9 +137,7 @@ export default function MentorPage() {
               <div key={m.id || `${m.role}-${i}`} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm ${m.role === "user" ? "bg-indigo-600 text-white" : "border border-slate-200 bg-slate-50 text-slate-800"}`}>
                   {m.role === "assistant" ? <div className="prose prose-sm max-w-none prose-slate"><ReactMarkdown>{m.content}</ReactMarkdown></div> : <p className="whitespace-pre-wrap">{m.content}</p>}
-                  {m.sources && m.sources.length > 0 && <p className="mt-2 text-xs text-slate-400">📚 {m.sources.join(", ")}</p>}
                   {m.blocked && <p className="mt-1 text-xs font-semibold text-rose-600">This request was blocked by the safety filter.</p>}
-                  {m.grounded === false && <p className="mt-1 text-xs font-semibold text-amber-600">⚠️ This response could not be fully grounded in the stored documents.</p>}
                 </div>
               </div>
             ))}
