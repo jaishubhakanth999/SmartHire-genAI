@@ -1,80 +1,77 @@
 """
-Resume parsing.
+Resume parsing through the central direct Sarvam client.
 
-Responsibility: turn raw resume text into a clean, structured profile --
-name, contact info, skills, experience, education, target role -- using the
-LLM's structured-output mode, validated with Pydantic before anything downstream trusts it.
+Responsibility: extract plain text from an uploaded resume, ask Sarvam for a
+strict JSON profile, and validate that response with Pydantic before any
+matching or CV feature trusts it.
 """
 
 from typing import List, Optional
 
-from langchain_sarvam import ChatSarvam
 from pydantic import BaseModel, Field
 
-from app.config import settings
 from app.services.loader import load_upload
-from app.services.prompts import RESUME_PARSE_PROMPT
+from app.services.sarvam_client import chat_json
 
 
 class Experience(BaseModel):
-    title: str = Field(description="Job title held.")
-    company: str = Field(description="Employer name.")
-    start_date: Optional[str] = Field(default=None, description="e.g. 'Jan 2022' or 'unknown'.")
-    end_date: Optional[str] = Field(default=None, description="e.g. 'Present' or 'unknown'.")
-    description: Optional[str] = Field(default=None, description="One or two lines on responsibilities/impact.")
+    title: str = Field(default="", description="Job title held.")
+    company: str = Field(default="", description="Employer name.")
+    start_date: Optional[str] = Field(default=None, description="Start date if stated.")
+    end_date: Optional[str] = Field(default=None, description="End date if stated.")
+    description: Optional[str] = Field(default=None, description="One or two lines on responsibilities or impact.")
 
 
 class Education(BaseModel):
-    degree: str = Field(description="Degree or qualification name.")
-    institution: str = Field(description="School / university name.")
-    year: Optional[str] = Field(default=None, description="Graduation year, if stated.")
+    degree: str = Field(default="", description="Degree or qualification name.")
+    institution: str = Field(default="", description="School or university name.")
+    year: Optional[str] = Field(default=None, description="Graduation year if stated.")
 
 
 class ResumeProfile(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
-    target_role: Optional[str] = Field(default=None, description="Role the candidate appears to target.")
+    target_role: Optional[str] = None
     skills: List[str] = Field(default_factory=list)
     experience: List[Experience] = Field(default_factory=list)
     education: List[Education] = Field(default_factory=list)
 
 
-_llm: Optional[ChatSarvam] = None
-_MAX_ATTEMPTS = 3
+MAX_RESUME_TEXT_FOR_AI = 60000
 
-
-def get_llm() -> ChatSarvam:
-    global _llm
-    if _llm is None:
-        settings.require_llm()
-        _llm = ChatSarvam(
-            model=settings.llm_model,
-            api_key=settings.llm_api_key,
-            temperature=0,
-            max_tokens=4096,
-            reasoning_effort="low",
-        )
-    return _llm
+_SYSTEM_PROMPT = """
+You extract structured data from a resume for a job-matching application.
+Return JSON only with exactly these top-level keys:
+name, email, phone, target_role, skills, experience, education.
+Rules:
+- Use only facts explicitly present in the supplied resume text.
+- Never invent employers, dates, skills, education, achievements, or contact details.
+- Use null for missing scalar fields and [] for missing lists.
+- Preserve the candidate's wording where useful, but keep experience descriptions concise.
+- target_role may be inferred only when the resume strongly indicates it; otherwise null.
+""".strip()
 
 
 def parse_resume_upload(filename: str, data: bytes) -> dict:
     raw_text = load_upload(filename, data)
-    structured_llm = get_llm().with_structured_output(ResumeProfile)
+    ai_text = raw_text[:MAX_RESUME_TEXT_FOR_AI]
 
-    last_error: Optional[Exception] = None
-    for attempt in range(1, _MAX_ATTEMPTS + 1):
-        try:
-            result = structured_llm.invoke(RESUME_PARSE_PROMPT.format(resume_text=raw_text))
-            profile = result if isinstance(result, ResumeProfile) else ResumeProfile.model_validate(result)
-            return {"parsed": profile.model_dump(), "raw_text": raw_text}
-        except Exception as exc:
-            last_error = exc
-            if attempt < _MAX_ATTEMPTS:
-                continue
-            raise ValueError(f"Resume parsing failed after {_MAX_ATTEMPTS} attempts: {exc}") from exc
+    messages = [
+        {"role": "system", "content": _SYSTEM_PROMPT},
+        {
+            "role": "user",
+            "content": (
+                "Extract the candidate profile from this resume text. "
+                f"The text may be truncated after {MAX_RESUME_TEXT_FOR_AI} characters.\n\n"
+                "RESUME TEXT:\n---\n" + ai_text + "\n---"
+            ),
+        },
+    ]
 
-    raise ValueError(f"Resume parsing failed: {last_error}")
+    payload = chat_json(messages, max_tokens=3500)
+    profile = ResumeProfile.model_validate(payload)
+    return {"parsed": profile.model_dump(), "raw_text": raw_text}
 
 
 def to_search_text(parsed: dict) -> str:
