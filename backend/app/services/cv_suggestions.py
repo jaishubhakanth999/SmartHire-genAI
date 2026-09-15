@@ -21,13 +21,12 @@ def get_llm() -> ChatSarvam:
     global _llm
     if _llm is None:
         settings.require_llm()
-        # max_tokens is generous on purpose: sarvam-105b is a reasoning model
-        # whose hidden reasoning tokens share the same output budget as the
-        # visible answer -- too low a cap truncates before any real content
-        # is written (finish_reason="length" with an empty .content), which
-        # otherwise looks identical to a dropped/empty API response.
         _llm = ChatSarvam(
-            model=settings.llm_model, api_key=settings.llm_api_key, temperature=0.3, max_tokens=4096
+            model=settings.llm_model,
+            api_key=settings.llm_api_key,
+            temperature=0.3,
+            max_tokens=4096,
+            reasoning_effort="low",
         )
     return _llm
 
