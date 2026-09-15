@@ -10,48 +10,57 @@ async function authHeaders(): Promise<Record<string, string>> {
   return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
 }
 
+function friendlyError(status: number, detail: string) {
+  if (status === 401) return "Your session has expired. Please sign in again.";
+  if (status === 403) return "You do not have permission to perform this action.";
+  if (status === 404) return detail || "The requested resource was not found.";
+  if (status === 413) return detail || "The uploaded file is too large.";
+  if (status === 422) return detail || "The submitted data could not be validated.";
+  if (status >= 500) return detail || "The server could not complete that request. Please try again.";
+  return detail || `Request failed (${status}).`;
+}
+
 async function handle(res: Response) {
+  if (res.status === 204) return null;
   if (!res.ok) {
     let detail = res.statusText;
     try {
       const body = await res.json();
       detail = body.detail || JSON.stringify(body);
     } catch {
-      // response wasn't JSON -- fall back to statusText
+      // response wasn't JSON
     }
-    throw new Error(detail);
+    throw new Error(friendlyError(res.status, detail));
   }
-  return res.json();
+  if (res.status === 200 || res.status === 201) {
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) return res.json();
+  }
+  return null;
 }
 
-export async function apiGet(path: string) {
-  const headers = await authHeaders();
-  const res = await fetch(`${API_URL}${path}`, { headers });
+async function request(path: string, init: RequestInit = {}) {
+  const headers = { ...(await authHeaders()), ...(init.headers || {}) };
+  const res = await fetch(`${API_URL}${path}`, { ...init, headers });
   return handle(res);
 }
 
-export async function apiPostJson(path: string, body: unknown) {
-  const headers = await authHeaders();
-  const res = await fetch(`${API_URL}${path}`, {
+export function apiGet(path: string) {
+  return request(path, { method: "GET" });
+}
+
+export function apiPostJson(path: string, body: unknown) {
+  return request(path, {
     method: "POST",
-    headers: { ...headers, "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  return handle(res);
 }
 
-export async function apiPostForm(path: string, form: FormData) {
-  const headers = await authHeaders();
-  const res = await fetch(`${API_URL}${path}`, {
-    method: "POST",
-    headers,
-    body: form,
-  });
-  return handle(res);
+export function apiPostForm(path: string, form: FormData) {
+  return request(path, { method: "POST", body: form });
 }
 
-export async function apiDelete(path: string) {
-  const headers = await authHeaders();
-  const res = await fetch(`${API_URL}${path}`, { method: "DELETE", headers });
-  return handle(res);
+export function apiDelete(path: string) {
+  return request(path, { method: "DELETE" });
 }
