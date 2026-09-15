@@ -1,6 +1,6 @@
 import { createClient } from "./supabase/client";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://smarthire-genai-api.onrender.com";
+const API_URL = "/api/backend";
 
 async function authHeaders(): Promise<Record<string, string>> {
   const supabase = createClient();
@@ -16,6 +16,7 @@ function friendlyError(status: number, detail: string) {
   if (status === 404) return detail || "The requested resource was not found.";
   if (status === 413) return detail || "The uploaded file is too large.";
   if (status === 422) return detail || "The submitted data could not be validated.";
+  if (status === 502) return detail || "The AI backend could not be reached. Please try again.";
   if (status >= 500) return detail || "The server could not complete that request. Please try again.";
   return detail || `Request failed (${status}).`;
 }
@@ -40,7 +41,17 @@ async function handle(res: Response) {
 async function request(path: string, init: RequestInit = {}, allowRefresh = true) {
   const supabase = createClient();
   const headers = { ...(await authHeaders()), ...(init.headers || {}) };
-  const res = await fetch(`${API_URL}${path}`, { ...init, headers });
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...init,
+      headers,
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error("Could not reach the SmartHire AI service. Please try again.");
+  }
 
   if (res.status === 401 && allowRefresh) {
     const { data, error } = await supabase.auth.refreshSession();
@@ -49,8 +60,16 @@ async function request(path: string, init: RequestInit = {}, allowRefresh = true
         ...(init.headers || {}),
         Authorization: `Bearer ${data.session.access_token}`,
       };
-      const retry = await fetch(`${API_URL}${path}`, { ...init, headers: refreshedHeaders });
-      return handle(retry);
+      try {
+        const retry = await fetch(`${API_URL}${path}`, {
+          ...init,
+          headers: refreshedHeaders,
+          cache: "no-store",
+        });
+        return handle(retry);
+      } catch {
+        throw new Error("Could not reach the SmartHire AI service. Please try again.");
+      }
     }
   }
 
