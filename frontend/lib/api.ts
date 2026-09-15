@@ -1,6 +1,6 @@
 import { createClient } from "./supabase/client";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://smarthire-genai-api.onrender.com";
 
 async function authHeaders(): Promise<Record<string, string>> {
   const supabase = createClient();
