@@ -1,9 +1,9 @@
-"""CV improvement suggestions, resume rewrite, and match explanation (Module 3)."""
+"""CV improvement suggestions, rewrite, explanation, and saved history."""
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import CurrentUser, get_current_user
-from app.database import get_job, get_resume, insert_cv_suggestion
+from app.database import get_job, get_resume, insert_cv_suggestion, list_cv_suggestions
 from app.schemas import CVActionRequest, CVActionResponse
 from app.services.cv_suggestions import explain_match, rewrite_resume_for_job, suggest_improvements
 
@@ -18,6 +18,13 @@ def _load_resume_and_job(req: CVActionRequest, user: CurrentUser):
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found.")
     return resume, job
+
+
+@router.get("/history/{resume_id}")
+async def cv_history(resume_id: str, user: CurrentUser = Depends(get_current_user)):
+    if get_resume(resume_id, user.id) is None:
+        raise HTTPException(status_code=404, detail="Resume not found.")
+    return {"items": list_cv_suggestions(resume_id, user.id)}
 
 
 @router.post("/suggestions", response_model=CVActionResponse)
